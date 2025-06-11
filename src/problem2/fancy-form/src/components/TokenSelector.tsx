@@ -57,9 +57,9 @@ const TokenSelector: React.FC<TokenSelectorProps> = ({
   // Render token option
   const renderTokenOption = (token: Token) => (
     <div className="flex items-center justify-between py-2">
-      <div className="flex items-center gap-3">
+      <div className="flex items-center gap-4">
         <Avatar
-          size={32}
+          size={36}
           src={getTokenIcon(token.symbol)}
           onError={() => handleImageError(token.symbol)}
           style={{ backgroundColor: '#f0f0f0' }}
@@ -88,10 +88,13 @@ const TokenSelector: React.FC<TokenSelectorProps> = ({
       disabled={disabled}
       placeholder="Select token"
       className={`token-selector-dropdown ${error ? 'error' : ''}`}
-      style={{ minWidth: 140 }}
-      dropdownStyle={{ padding: 0 }}
+      style={{ minWidth: 180 }}
+      dropdownStyle={{ padding: 0, minWidth: 280 }}
       optionLabelProp="label"
       showSearch={false}
+      listItemHeight={60}
+      listHeight={320}
+      dropdownMatchSelectWidth={false}
       dropdownRender={(menu) => (
         <div>
           <div className="p-3 border-b">
@@ -123,9 +126,9 @@ const TokenSelector: React.FC<TokenSelectorProps> = ({
           key={token.symbol}
           value={token.symbol}
           label={
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-3">
               <Avatar
-                size={20}
+                size={24}
                 src={getTokenIcon(token.symbol)}
                 onError={() => handleImageError(token.symbol)}
                 style={{ backgroundColor: '#f0f0f0' }}

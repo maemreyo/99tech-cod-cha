@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap");
 
 * {
   box-sizing: border-box;
@@ -11,7 +11,7 @@
   --success-color: #52c41a;
   --error-color: #ff4d4f;
   --warning-color: #faad14;
-  
+
   /* Light mode colors */
   --light-bg: #f5f7fa;
   --light-card-bg: #ffffff;
@@ -19,7 +19,7 @@
   --light-text-secondary: #6b7280;
   --light-border: #e2e8f0;
   --light-hover: #f3f4f6;
-  
+
   /* Dark mode colors */
   --dark-bg: #0f1419;
   --dark-card-bg: #1a1f2e;
@@ -30,7 +30,8 @@
 }
 
 body {
-  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+    sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   margin: 0;
@@ -60,7 +61,7 @@ body {
 /* Animated background elements */
 .app-container::before,
 .app-container::after {
-  content: '';
+  content: "";
   position: absolute;
   border-radius: 50%;
   filter: blur(100px);
@@ -86,7 +87,8 @@ body {
 }
 
 @keyframes float {
-  0%, 100% {
+  0%,
+  100% {
     transform: translate(0, 0) rotate(0deg);
   }
   33% {
@@ -346,7 +348,7 @@ body {
 }
 
 .submit-button.loading::after {
-  content: '';
+  content: "";
   position: absolute;
   width: 20px;
   height: 20px;

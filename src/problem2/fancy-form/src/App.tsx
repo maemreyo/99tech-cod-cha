@@ -5,8 +5,6 @@ import { Toaster } from "react-hot-toast";
 import SwapForm from "./components/SwapForm";
 import "./App.css";
 
-// Ant Design v5 includes styles automatically, no need for separate import
-
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
