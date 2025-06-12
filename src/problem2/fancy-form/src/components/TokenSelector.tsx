@@ -85,12 +85,19 @@ const TokenSelector: React.FC<TokenSelectorProps> = ({
   return (
     <Select
       value={value}
+      styles={{
+        popup: {
+          root: {
+            padding: 0,
+            minWidth: 200,
+          },
+        },
+      }}
       onChange={onChange}
       disabled={disabled}
       placeholder="Select token"
       className={`token-selector-dropdown ${error ? "error" : ""}`}
       style={{ minWidth: 180 }}
-      dropdownStyle={{ padding: 0, minWidth: 280 }}
       optionLabelProp="label"
       showSearch={false}
       listItemHeight={60}
