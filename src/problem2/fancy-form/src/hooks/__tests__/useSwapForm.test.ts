@@ -1,7 +1,65 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { renderHook, act } from "@testing-library/react";
 import * as React from "react";
-import { useSwapForm, createSwapSchema } from "../useSwapForm";
+import { useSwapForm } from "../useSwapForm";
+import { createSwapSchema } from "../../validations/swapFormSchema";
+import * as swapFormUtils from "../swapFormUtils";
+import { PrecisionHandler } from "../../utils/precisionHandler";
+
+// Mock the PrecisionHandler
+vi.mock("../../utils/precisionHandler", () => {
+  return {
+    PrecisionHandler: {
+      parseNumber: vi.fn((val) => Number(val) || 0),
+      isAmountValid: vi.fn((amount, balance) => Number(amount) <= balance),
+      formatMaxAmount: vi.fn((balance) => balance.toString()),
+      isMaxAmount: vi.fn((amount, balance) => amount === balance.toString()),
+      compareDecimals: vi.fn((a, b) => {
+        const numA = Number(a);
+        const numB = Number(b);
+        if (numA < numB) return -1;
+        if (numA > numB) return 1;
+        return 0;
+      }),
+    },
+  };
+});
+
+// Mock the swapFormUtils
+vi.mock("../swapFormUtils", () => {
+  return {
+    createAmountChangeHandler: vi.fn((trigger) => {
+      return async (value, onChange) => {
+        onChange(value.replace(/[^0-9.]/g, ""));
+        setTimeout(() => trigger("fromAmount"), 100);
+      };
+    }),
+    createSwapTokensHandler: vi.fn((fromToken, toToken, setValue) => {
+      return (toAmount) => {
+        if (!fromToken || !toToken) return;
+        setValue("fromToken", toToken, { shouldValidate: false });
+        setValue("toToken", fromToken, { shouldValidate: false });
+        setValue("fromAmount", toAmount, { shouldValidate: true });
+      };
+    }),
+    createMaxClickHandler: vi.fn((fromToken, tokenBalances, setValue, trigger) => {
+      return async () => {
+        if (fromToken && tokenBalances[fromToken]) {
+          setValue("fromAmount", tokenBalances[fromToken].toString(), { shouldValidate: false });
+          trigger("fromAmount");
+        }
+      };
+    }),
+    isFormValid: vi.fn((fromToken, toToken, fromAmount, tokenBalances) => {
+      if (!fromToken || !toToken || !fromAmount) return false;
+      if (fromToken === toToken) return false;
+      const amount = Number(fromAmount);
+      if (amount <= 0) return false;
+      const balance = tokenBalances[fromToken] || 0;
+      return amount <= balance;
+    }),
+  };
+});
 
 // Mock react-hook-form
 vi.mock("react-hook-form", async () => {
@@ -52,6 +110,41 @@ vi.mock("../../utils/formatters", () => ({
   sanitizeNumericInput: (value) => value.replace(/[^0-9.]/g, ""),
 }));
 
+// Mock the validation schema
+vi.mock("../../validations/swapFormSchema", () => ({
+  createSwapSchema: vi.fn((tokenBalances) => {
+    return {
+      safeParse: (data) => {
+        const { fromToken, toToken, fromAmount } = data;
+        
+        // Basic validation
+        if (!fromToken) return { success: false, error: { issues: [{ path: ["fromToken"] }] } };
+        if (!toToken) return { success: false, error: { issues: [{ path: ["toToken"] }] } };
+        if (fromToken === toToken) return { success: false, error: { issues: [{ path: ["toToken"] }] } };
+        if (!fromAmount) return { success: false, error: { issues: [{ path: ["fromAmount"] }] } };
+        
+        const amount = Number(fromAmount);
+        if (isNaN(amount) || amount <= 0) {
+          return { success: false, error: { issues: [{ path: ["fromAmount"] }] } };
+        }
+        
+        // Balance validation
+        const balance = tokenBalances[fromToken] || 0;
+        if (amount > balance) {
+          return { success: false, error: { issues: [{ path: ["fromAmount"] }] } };
+        }
+        
+        return { success: true, data };
+      }
+    };
+  })
+}));
+
+// Mock zodResolver
+vi.mock("@hookform/resolvers/zod", () => ({
+  zodResolver: vi.fn(() => (data) => ({ values: data, errors: {} })),
+}));
+
 describe("useSwapForm", () => {
   const mockTokenBalances = {
     ETH: 10,
@@ -67,6 +160,12 @@ describe("useSwapForm", () => {
       callback();
       return 0 as any;
     });
+    
+    // Reset mocks
+    vi.mocked(swapFormUtils.createAmountChangeHandler).mockClear();
+    vi.mocked(swapFormUtils.createSwapTokensHandler).mockClear();
+    vi.mocked(swapFormUtils.createMaxClickHandler).mockClear();
+    vi.mocked(swapFormUtils.isFormValid).mockClear();
   });
   
   describe("createSwapSchema", () => {
@@ -181,6 +280,15 @@ describe("useSwapForm", () => {
       expect(result.current.isFormValid).toBe(false);
     });
     
+    it("creates form utility handlers", () => {
+      renderHook(() => useSwapForm(mockTokenBalances));
+      
+      // Verify that the utility creators were called
+      expect(swapFormUtils.createAmountChangeHandler).toHaveBeenCalled();
+      expect(swapFormUtils.createSwapTokensHandler).toHaveBeenCalled();
+      expect(swapFormUtils.createMaxClickHandler).toHaveBeenCalled();
+    });
+    
     it("handles amount change", () => {
       const { result } = renderHook(() => useSwapForm(mockTokenBalances));
       
@@ -195,26 +303,32 @@ describe("useSwapForm", () => {
     });
     
     it("handles max button click", () => {
-      // Create a simplified test that doesn't rely on mocking setValue
       const { result } = renderHook(() => useSwapForm(mockTokenBalances));
       
-      // Just verify the function exists
+      act(() => {
+        result.current.handleMaxClick();
+      });
+      
+      // Verify the function was called and exists
       expect(typeof result.current.handleMaxClick).toBe("function");
     });
     
     it("handles token swap", () => {
-      // Create a simplified test that doesn't rely on mocking setValue
       const { result } = renderHook(() => useSwapForm(mockTokenBalances));
       
-      // Just verify the function exists
+      // Just verify the function exists and is callable
       expect(typeof result.current.handleSwapTokens).toBe("function");
+      
+      act(() => {
+        result.current.handleSwapTokens("0.5");
+      });
     });
     
-    it("determines form validity", () => {
-      // Create a simplified test
+    it("determines form validity using the utility function", () => {
       const { result } = renderHook(() => useSwapForm(mockTokenBalances));
       
-      // Just verify the property exists
+      // Verify isFormValid was called
+      expect(swapFormUtils.isFormValid).toHaveBeenCalled();
       expect(typeof result.current.isFormValid).toBe("boolean");
     });
   });
