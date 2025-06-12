@@ -42,5 +42,13 @@ export default tseslint.config(
 
       "@typescript-eslint/no-fallthrough": "warn",
     },
+  },
+  // For tests
+  {
+    files: ["**/*.{test,spec}.{ts,tsx}"],
+    rules: {
+      "@typescript-eslint/no-explicit-any": "off",
+      "@typescript-eslint/no-non-null-assertion": "off",
+    },
   }
 );
