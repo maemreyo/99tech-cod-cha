@@ -94,8 +94,8 @@ const TokenSelector: React.FC<TokenSelectorProps> = ({
       showSearch={false}
       listItemHeight={60}
       listHeight={320}
-      dropdownMatchSelectWidth={false}
-      dropdownRender={(menu) => (
+      popupMatchSelectWidth={false}
+      popupRender={(menu) => (
         <div>
           <div className="p-3 border-b">
             <Input
