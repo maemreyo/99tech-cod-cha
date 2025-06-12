@@ -48,7 +48,7 @@ export interface Balance {
 }
 
 export interface TransactionStatus {
-  status: 'pending' | 'success' | 'failed';
+  status: "pending" | "success" | "failed";
   txHash?: string;
   error?: string;
 }

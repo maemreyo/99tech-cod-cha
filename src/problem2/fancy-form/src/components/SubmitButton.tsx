@@ -24,27 +24,27 @@ const SubmitButton: React.FC<SubmitButtonProps> = ({
     if (isSwapping) {
       return <Loader2 className="animate-spin" size={16} />;
     }
-    
+
     if (isFormValid) {
       return "Swap Tokens";
     }
-    
+
     if (!fromToken || !toToken) {
       return "Select tokens";
     }
-    
+
     if (!fromAmount) {
       return "Enter an amount";
     }
-    
+
     if (Number(fromAmount) <= 0) {
       return "Enter valid amount";
     }
-    
+
     if (tokenBalances[fromToken] < Number(fromAmount)) {
       return "Insufficient balance";
     }
-    
+
     return "Enter an amount";
   };
 

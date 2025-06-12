@@ -21,12 +21,14 @@ const SwapForm: React.FC = () => {
   // UI state
   const [isSwapping, setIsSwapping] = useState(false);
   const [showConfirmModal, setShowConfirmModal] = useState(false);
-  const [pendingSwapData, setPendingSwapData] = useState<SwapFormData | null>(null);
+  const [pendingSwapData, setPendingSwapData] = useState<SwapFormData | null>(
+    null
+  );
 
   // Data fetching
   const { data: tokens, isLoading: tokensLoading } = useTokenList();
   const { data: prices, isLoading: pricesLoading } = useTokenPrices();
-  
+
   // Token balances management
   const { tokenBalances, updateBalances } = useTokenBalances(tokens);
 

@@ -1,8 +1,8 @@
-import React, { useState, useMemo } from 'react';
-import { Select, Input, Avatar, Empty, Spin } from 'antd';
-import { SearchOutlined, CheckCircleOutlined } from '@ant-design/icons';
-import { motion } from 'framer-motion';
-import type { Token } from '../types';
+import React, { useState, useMemo } from "react";
+import { Select, Input, Avatar, Empty, Spin } from "antd";
+import { SearchOutlined, CheckCircleOutlined } from "@ant-design/icons";
+import { motion } from "framer-motion";
+import type { Token } from "../types";
 
 interface TokenSelectorProps {
   value: string;
@@ -21,7 +21,7 @@ const TokenSelector: React.FC<TokenSelectorProps> = ({
   error,
   disabled,
 }) => {
-  const [searchQuery, setSearchQuery] = useState('');
+  const [searchQuery, setSearchQuery] = useState("");
   const [imageErrors, setImageErrors] = useState<Set<string>>(new Set());
 
   // Filter tokens based on search query and exclusion
@@ -29,7 +29,7 @@ const TokenSelector: React.FC<TokenSelectorProps> = ({
     return tokens.filter((token) => {
       if (token.symbol === excludeToken) return false;
       if (!searchQuery) return true;
-      
+
       const query = searchQuery.toLowerCase();
       return (
         token.symbol.toLowerCase().includes(query) ||
@@ -42,8 +42,9 @@ const TokenSelector: React.FC<TokenSelectorProps> = ({
   const selectedToken = tokens.find((t) => t.symbol === value);
 
   // Handle image load errors
-  const handleImageError = (symbol: string) => {
+  const handleImageError = (symbol: string): boolean => {
     setImageErrors((prev) => new Set(prev).add(symbol));
+    return true; // Return true to prevent default fallback behavior
   };
 
   // Get token icon URL with fallback
@@ -62,7 +63,7 @@ const TokenSelector: React.FC<TokenSelectorProps> = ({
           size={36}
           src={getTokenIcon(token.symbol)}
           onError={() => handleImageError(token.symbol)}
-          style={{ backgroundColor: '#f0f0f0' }}
+          style={{ backgroundColor: "#f0f0f0" }}
         >
           {token.symbol.charAt(0)}
         </Avatar>
@@ -87,7 +88,7 @@ const TokenSelector: React.FC<TokenSelectorProps> = ({
       onChange={onChange}
       disabled={disabled}
       placeholder="Select token"
-      className={`token-selector-dropdown ${error ? 'error' : ''}`}
+      className={`token-selector-dropdown ${error ? "error" : ""}`}
       style={{ minWidth: 180 }}
       dropdownStyle={{ padding: 0, minWidth: 280 }}
       optionLabelProp="label"
@@ -131,7 +132,7 @@ const TokenSelector: React.FC<TokenSelectorProps> = ({
                 size={24}
                 src={getTokenIcon(token.symbol)}
                 onError={() => handleImageError(token.symbol)}
-                style={{ backgroundColor: '#f0f0f0' }}
+                style={{ backgroundColor: "#f0f0f0" }}
               >
                 {token.symbol.charAt(0)}
               </Avatar>

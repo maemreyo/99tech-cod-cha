@@ -5,8 +5,8 @@
  * @returns Formatted string
  */
 export const formatNumber = (value: number, decimals?: number): string => {
-  if (value === 0) return '0';
-  
+  if (value === 0) return "0";
+
   // Auto-determine decimals based on value size
   if (decimals === undefined) {
     if (value >= 1000) {
@@ -21,7 +21,7 @@ export const formatNumber = (value: number, decimals?: number): string => {
   }
 
   // Format with commas and decimals
-  const formatted = new Intl.NumberFormat('en-US', {
+  const formatted = new Intl.NumberFormat("en-US", {
     minimumFractionDigits: 0,
     maximumFractionDigits: decimals,
   }).format(value);
@@ -36,11 +36,11 @@ export const formatNumber = (value: number, decimals?: number): string => {
  */
 export const formatLargeNumber = (value: number): string => {
   if (value >= 1e9) {
-    return formatNumber(value / 1e9, 2) + 'B';
+    return formatNumber(value / 1e9, 2) + "B";
   } else if (value >= 1e6) {
-    return formatNumber(value / 1e6, 2) + 'M';
+    return formatNumber(value / 1e6, 2) + "M";
   } else if (value >= 1e3) {
-    return formatNumber(value / 1e3, 2) + 'K';
+    return formatNumber(value / 1e3, 2) + "K";
   }
   return formatNumber(value, 2);
 };
@@ -51,9 +51,9 @@ export const formatLargeNumber = (value: number): string => {
  * @returns Formatted USD string
  */
 export const formatUSD = (value: number): string => {
-  return new Intl.NumberFormat('en-US', {
-    style: 'currency',
-    currency: 'USD',
+  return new Intl.NumberFormat("en-US", {
+    style: "currency",
+    currency: "USD",
     minimumFractionDigits: 2,
     maximumFractionDigits: 2,
   }).format(value);
@@ -86,10 +86,10 @@ export const calculatePriceImpact = (
   marketRate: number
 ): number => {
   if (!inputAmount || !outputAmount || !marketRate) return 0;
-  
+
   const expectedOutput = inputAmount * marketRate;
   const impact = ((expectedOutput - outputAmount) / expectedOutput) * 100;
-  
+
   return Math.abs(impact);
 };
 
@@ -100,19 +100,19 @@ export const calculatePriceImpact = (
  */
 export const sanitizeNumericInput = (value: string): string => {
   // Remove all non-numeric characters except decimal point
-  let sanitized = value.replace(/[^0-9.]/g, '');
-  
+  let sanitized = value.replace(/[^0-9.]/g, "");
+
   // Ensure only one decimal point
-  const parts = sanitized.split('.');
+  const parts = sanitized.split(".");
   if (parts.length > 2) {
-    sanitized = parts[0] + '.' + parts.slice(1).join('');
+    sanitized = parts[0] + "." + parts.slice(1).join("");
   }
-  
+
   // Remove leading zeros (except for decimals)
-  if (sanitized.length > 1 && sanitized[0] === '0' && sanitized[1] !== '.') {
+  if (sanitized.length > 1 && sanitized[0] === "0" && sanitized[1] !== ".") {
     sanitized = sanitized.substring(1);
   }
-  
+
   return sanitized;
 };
 
@@ -133,8 +133,11 @@ export const parseNumericString = (value: string): number => {
  * @param decimals - Number of decimal places
  * @returns Formatted percentage string
  */
-export const formatPercentage = (value: number, decimals: number = 2): string => {
-  return formatNumber(value * 100, decimals) + '%';
+export const formatPercentage = (
+  value: number,
+  decimals: number = 2
+): string => {
+  return formatNumber(value * 100, decimals) + "%";
 };
 
 /**
@@ -166,16 +169,16 @@ export const timeAgo = (timestamp: number | Date): string => {
   const now = Date.now();
   const time = timestamp instanceof Date ? timestamp.getTime() : timestamp;
   const diff = now - time;
-  
+
   const seconds = Math.floor(diff / 1000);
   const minutes = Math.floor(seconds / 60);
   const hours = Math.floor(minutes / 60);
   const days = Math.floor(hours / 24);
-  
+
   if (days > 0) return `${days}d ago`;
   if (hours > 0) return `${hours}h ago`;
   if (minutes > 0) return `${minutes}m ago`;
-  return 'Just now';
+  return "Just now";
 };
 
 /**
@@ -188,8 +191,8 @@ export const debounce = <T extends (...args: any[]) => any>(
   func: T,
   wait: number
 ): ((...args: Parameters<T>) => void) => {
-  let timeout: NodeJS.Timeout;
-  
+  let timeout: number | undefined;
+
   return (...args: Parameters<T>) => {
     clearTimeout(timeout);
     timeout = setTimeout(() => func(...args), wait);
@@ -202,7 +205,7 @@ export const debounce = <T extends (...args: any[]) => any>(
  * @returns Promise that resolves after delay
  */
 export const sleep = (ms: number): Promise<void> => {
-  return new Promise(resolve => setTimeout(resolve, ms));
+  return new Promise((resolve) => setTimeout(resolve, ms));
 };
 
 /**
@@ -211,19 +214,22 @@ export const sleep = (ms: number): Promise<void> => {
  * @param decimals - Token decimals
  * @returns Formatted amount
  */
-export const formatTokenAmount = (amount: string, decimals: number = 18): string => {
+export const formatTokenAmount = (
+  amount: string,
+  decimals: number = 18
+): string => {
   const value = BigInt(amount);
   const divisor = BigInt(10 ** decimals);
   const wholePart = value / divisor;
   const fractionalPart = value % divisor;
-  
+
   if (fractionalPart === BigInt(0)) {
     return wholePart.toString();
   }
-  
-  const fractionalStr = fractionalPart.toString().padStart(decimals, '0');
-  const trimmed = fractionalStr.replace(/0+$/, '');
-  
+
+  const fractionalStr = fractionalPart.toString().padStart(decimals, "0");
+  const trimmed = fractionalStr.replace(/0+$/, "");
+
   return `${wholePart}.${trimmed}`;
 };
 
@@ -233,8 +239,11 @@ export const formatTokenAmount = (amount: string, decimals: number = 18): string
  * @param decimals - Token decimals
  * @returns Raw amount as string
  */
-export const parseTokenAmount = (amount: string, decimals: number = 18): string => {
-  const [whole, fractional = ''] = amount.split('.');
-  const paddedFractional = fractional.padEnd(decimals, '0').slice(0, decimals);
+export const parseTokenAmount = (
+  amount: string,
+  decimals: number = 18
+): string => {
+  const [whole, fractional = ""] = amount.split(".");
+  const paddedFractional = fractional.padEnd(decimals, "0").slice(0, decimals);
   return whole + paddedFractional;
 };

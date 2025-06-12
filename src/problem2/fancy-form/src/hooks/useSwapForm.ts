@@ -11,43 +11,45 @@ import type { SwapFormData } from "../types";
  * @returns Zod schema for form validation
  */
 export const createSwapSchema = (tokenBalances: Record<string, number>) => {
-  return z
-    .object({
-      fromToken: z.string().min(1, "Please select a token to swap from"),
-      toToken: z.string().min(1, "Please select a token to swap to"),
-      fromAmount: z
-        .string()
-        .min(1, "Please enter an amount")
-        .refine((val) => !isNaN(Number(val)) && Number(val) > 0, {
-          message: "Amount must be a positive number",
-        }),
-    })
-    // First validate that tokens are different
-    .refine((data) => data.fromToken !== data.toToken, {
-      message: "Cannot swap to the same token",
-      path: ["toToken"],
-    })
-    // Then validate the balance
-    .refine(
-      (data) => {
-        // Skip validation if no token is selected or amount is invalid
-        if (
-          !data.fromToken ||
-          !data.fromAmount ||
-          isNaN(Number(data.fromAmount))
-        ) {
-          return true;
-        }
+  return (
+    z
+      .object({
+        fromToken: z.string().min(1, "Please select a token to swap from"),
+        toToken: z.string().min(1, "Please select a token to swap to"),
+        fromAmount: z
+          .string()
+          .min(1, "Please enter an amount")
+          .refine((val) => !isNaN(Number(val)) && Number(val) > 0, {
+            message: "Amount must be a positive number",
+          }),
+      })
+      // First validate that tokens are different
+      .refine((data) => data.fromToken !== data.toToken, {
+        message: "Cannot swap to the same token",
+        path: ["toToken"],
+      })
+      // Then validate the balance
+      .refine(
+        (data) => {
+          // Skip validation if no token is selected or amount is invalid
+          if (
+            !data.fromToken ||
+            !data.fromAmount ||
+            isNaN(Number(data.fromAmount))
+          ) {
+            return true;
+          }
 
-        const amount = Number(data.fromAmount);
-        const balance = tokenBalances[data.fromToken] || 0;
-        return amount <= balance;
-      },
-      {
-        message: "Insufficient balance",
-        path: ["fromAmount"],
-      }
-    );
+          const amount = Number(data.fromAmount);
+          const balance = tokenBalances[data.fromToken] || 0;
+          return amount <= balance;
+        },
+        {
+          message: "Insufficient balance",
+          path: ["fromAmount"],
+        }
+      )
+  );
 };
 
 /**

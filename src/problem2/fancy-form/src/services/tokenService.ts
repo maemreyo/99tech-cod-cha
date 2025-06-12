@@ -1,8 +1,9 @@
-import axios from 'axios';
-import type { Token, TokenPrice, PriceData } from '../types';
+import axios from "axios";
+import type { Token, TokenPrice, PriceData } from "../types";
 
-const PRICES_API_URL = 'https://interview.switcheo.com/prices.json';
-const ICONS_BASE_URL = 'https://raw.githubusercontent.com/Switcheo/token-icons/main/tokens';
+const PRICES_API_URL = "https://interview.switcheo.com/prices.json";
+const ICONS_BASE_URL =
+  "https://raw.githubusercontent.com/Switcheo/token-icons/main/tokens";
 
 // Cache for token metadata to avoid repeated fetches
 const tokenMetadataCache = new Map<string, Token>();
@@ -19,7 +20,7 @@ export const fetchTokenList = async (): Promise<Token[]> => {
 
     // Extract unique tokens from price data
     const tokenMap = new Map<string, Token>();
-    
+
     prices.forEach((priceData) => {
       if (!tokenMap.has(priceData.currency)) {
         const token: Token = {
@@ -33,13 +34,13 @@ export const fetchTokenList = async (): Promise<Token[]> => {
     });
 
     // Convert to array and sort alphabetically
-    const tokens = Array.from(tokenMap.values()).sort((a, b) => 
+    const tokens = Array.from(tokenMap.values()).sort((a, b) =>
       a.symbol.localeCompare(b.symbol)
     );
 
     return tokens;
   } catch (error) {
-    console.error('Failed to fetch token list:', error);
+    console.error("Failed to fetch token list:", error);
     // Return some default tokens on error
     return getDefaultTokens();
   }
@@ -55,7 +56,7 @@ export const fetchTokenPrices = async (): Promise<PriceData> => {
 
     // Process price data to get the latest price for each token
     const priceMap: PriceData = {};
-    
+
     // Group by currency and get the latest price
     const latestPrices = prices.reduce((acc, price) => {
       const existing = acc[price.currency];
@@ -72,8 +73,8 @@ export const fetchTokenPrices = async (): Promise<PriceData> => {
 
     return priceMap;
   } catch (error) {
-    console.error('Failed to fetch token prices:', error);
-    throw new Error('Unable to fetch current prices. Please try again.');
+    console.error("Failed to fetch token prices:", error);
+    throw new Error("Unable to fetch current prices. Please try again.");
   }
 };
 
@@ -81,7 +82,9 @@ export const fetchTokenPrices = async (): Promise<PriceData> => {
  * Fetch detailed token metadata
  * In a real app, this would fetch from a token registry
  */
-export const fetchTokenMetadata = async (symbol: string): Promise<Token | null> => {
+export const fetchTokenMetadata = async (
+  symbol: string
+): Promise<Token | null> => {
   // Check cache first
   if (tokenMetadataCache.has(symbol)) {
     return tokenMetadataCache.get(symbol)!;
@@ -123,36 +126,36 @@ export const validateTokenIcon = async (symbol: string): Promise<boolean> => {
  */
 const getTokenName = (symbol: string): string => {
   const nameMap: Record<string, string> = {
-    'ETH': 'Ethereum',
-    'WBTC': 'Wrapped Bitcoin',
-    'USDC': 'USD Coin',
-    'USDT': 'Tether USD',
-    'DAI': 'Dai Stablecoin',
-    'BUSD': 'Binance USD',
-    'ATOM': 'Cosmos Hub',
-    'OSMO': 'Osmosis',
-    'LUNA': 'Terra Luna',
-    'SWTH': 'Switcheo Token',
-    'BLUR': 'Blur',
-    'bNEO': 'Binance NEO',
-    'GMX': 'GMX',
-    'STEVMOS': 'Staked EVMOS',
-    'RATOM': 'Staked ATOM',
-    'STRD': 'Stride',
-    'EVMOS': 'Evmos',
-    'IRIS': 'IRISnet',
-    'IBCX': 'IBC Index',
-    'KUJI': 'Kujira',
-    'STOSMO': 'Staked OSMO',
-    'STATOM': 'Staked ATOM',
-    'STLUNA': 'Staked LUNA',
-    'LSI': 'LSI Token',
-    'OKB': 'OKB',
-    'OKT': 'OKT',
-    'USC': 'USC Stablecoin',
-    'wstETH': 'Wrapped stETH',
-    'YieldUSD': 'Yield USD',
-    'ZIL': 'Zilliqa',
+    ETH: "Ethereum",
+    WBTC: "Wrapped Bitcoin",
+    USDC: "USD Coin",
+    USDT: "Tether USD",
+    DAI: "Dai Stablecoin",
+    BUSD: "Binance USD",
+    ATOM: "Cosmos Hub",
+    OSMO: "Osmosis",
+    LUNA: "Terra Luna",
+    SWTH: "Switcheo Token",
+    BLUR: "Blur",
+    bNEO: "Binance NEO",
+    GMX: "GMX",
+    STEVMOS: "Staked EVMOS",
+    RATOM: "Staked ATOM",
+    STRD: "Stride",
+    EVMOS: "Evmos",
+    IRIS: "IRISnet",
+    IBCX: "IBC Index",
+    KUJI: "Kujira",
+    STOSMO: "Staked OSMO",
+    STATOM: "Staked ATOM",
+    STLUNA: "Staked LUNA",
+    LSI: "LSI Token",
+    OKB: "OKB",
+    OKT: "OKT",
+    USC: "USC Stablecoin",
+    wstETH: "Wrapped stETH",
+    YieldUSD: "Yield USD",
+    ZIL: "Zilliqa",
   };
 
   return nameMap[symbol] || symbol;
@@ -162,8 +165,8 @@ const getTokenName = (symbol: string): string => {
  * Get default tokens for fallback
  */
 const getDefaultTokens = (): Token[] => {
-  const defaultSymbols = ['ETH', 'USDC', 'WBTC', 'DAI', 'USDT'];
-  return defaultSymbols.map(symbol => ({
+  const defaultSymbols = ["ETH", "USDC", "WBTC", "DAI", "USDT"];
+  return defaultSymbols.map((symbol) => ({
     symbol,
     name: getTokenName(symbol),
     logoURI: `${ICONS_BASE_URL}/${symbol}.svg`,
@@ -183,6 +186,6 @@ export const calculatePriceImpact = (
   const tradeValue = amount * fromPrice;
   const baseImpact = 0.05; // 0.05% base fee
   const sizeImpact = Math.min(tradeValue / 100000, 0.05); // Up to 5% for large trades
-  
+
   return (baseImpact + sizeImpact) * 100; // Return as percentage
 };

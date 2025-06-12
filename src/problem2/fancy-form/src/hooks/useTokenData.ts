@@ -1,6 +1,3 @@
-// src/problem2/fancy-form/src/hooks/useTokenData.ts
-// Custom hooks for fetching token data with React Query
-
 import { useQuery } from "@tanstack/react-query";
 import { fetchTokenList, fetchTokenPrices } from "../services/tokenService";
 import type { Token, PriceData } from "../types";

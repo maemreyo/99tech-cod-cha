@@ -15,7 +15,10 @@ interface FromTokenSectionProps {
   excludeToken: string;
   tokenBalances: Record<string, number>;
   fromToken: string;
-  handleAmountChange: (value: string, onChange: (value: string) => void) => void;
+  handleAmountChange: (
+    value: string,
+    onChange: (value: string) => void
+  ) => void;
   handleMaxClick: () => void;
   trigger: (name: "fromAmount") => Promise<boolean>;
 }
@@ -62,17 +65,13 @@ const FromTokenSection: React.FC<FromTokenSectionProps> = ({
         render={({ field }) => (
           <Input
             {...field}
-            className={`amount-input ${
-              errors.fromAmount ? "input-error" : ""
-            }`}
+            className={`amount-input ${errors.fromAmount ? "input-error" : ""}`}
             placeholder="0.00"
             autoComplete="off"
             type="text"
             pattern="[0-9]*[.,]?[0-9]*"
             inputMode="decimal"
-            onChange={(e) =>
-              handleAmountChange(e.target.value, field.onChange)
-            }
+            onChange={(e) => handleAmountChange(e.target.value, field.onChange)}
           />
         )}
       />

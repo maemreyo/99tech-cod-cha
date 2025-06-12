@@ -7,11 +7,17 @@ import type { Token } from "../types";
  * @returns Token balances and setter function
  */
 export const useTokenBalances = (tokens: Token[] | undefined) => {
-  const [tokenBalances, setTokenBalances] = useState<Record<string, number>>({});
+  const [tokenBalances, setTokenBalances] = useState<Record<string, number>>(
+    {}
+  );
 
   // Initialize token balances with random values
   useEffect(() => {
-    if (tokens && tokens.length > 0 && Object.keys(tokenBalances).length === 0) {
+    if (
+      tokens &&
+      tokens.length > 0 &&
+      Object.keys(tokenBalances).length === 0
+    ) {
       const balances: Record<string, number> = {};
       tokens.forEach((token) => {
         balances[token.symbol] = Math.random() * 1000 + 100;
@@ -21,7 +27,12 @@ export const useTokenBalances = (tokens: Token[] | undefined) => {
   }, [tokens, tokenBalances]);
 
   // Update balance after a successful swap
-  const updateBalances = (fromToken: string, toToken: string, fromAmount: number, toAmount: number) => {
+  const updateBalances = (
+    fromToken: string,
+    toToken: string,
+    fromAmount: number,
+    toAmount: number
+  ) => {
     setTokenBalances((prev) => ({
       ...prev,
       [fromToken]: prev[fromToken] - fromAmount,
